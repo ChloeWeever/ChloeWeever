@@ -1,10 +1,10 @@
+- 😄 Learn about me here: [Chloe's Blog](http://10005480di8ni.vicp.fun/lu/chloe/)
 - 👋 Hi, I’m @ChloeWeever
 - 👀 I’m interested in CV and ML
 - 🌱 I’m currently working as an intern in Morgan Stanley China
 - 💞️ I’m looking to collaborate on ...
 - 📫 Reach me: luyukai47@outlook.com
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
+
 
 <!---
 ChloeWeever/ChloeWeever is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
