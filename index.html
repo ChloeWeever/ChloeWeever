@@ -102,6 +102,7 @@
     margin-inline: auto;
     padding-inline: clamp(1.25rem, 4.5vw, 2.25rem);
     position: relative;
+    z-index: 1;
   }
 
   /* ─── masthead (N6) ───────────────────────────────────────────────── */
@@ -581,6 +582,43 @@
   .corner-doodle--tr { top: var(--space-md); right: var(--space-md); }
   .corner-doodle--bl { bottom: var(--space-md); left: var(--space-md); transform: rotate(180deg); }
 
+  /* ─── falling botanicals ───────────────────────────────────────────── */
+  .fall-field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .fall-field__gutter {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: max(0px, calc((100vw - 56rem) / 2));
+  }
+  .fall-field__gutter--left { left: 0; }
+  .fall-field__gutter--right { right: 0; }
+  .fall-item {
+    position: absolute;
+    top: -12vh;
+    left: var(--fall-left);
+    width: var(--fall-size);
+    height: var(--fall-size);
+    color: var(--fall-color);
+    opacity: 0;
+    animation: botanical-fall var(--fall-duration) linear var(--fall-delay) infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes botanical-fall {
+    0% { opacity: 0; transform: translate3d(0, -8vh, 0) rotate(0deg); }
+    10%, 82% { opacity: var(--fall-opacity); }
+    48% { transform: translate3d(var(--fall-drift), 54vh, 0) rotate(var(--fall-spin-half)); }
+    100% { opacity: 0; transform: translate3d(var(--fall-end), 116vh, 0) rotate(var(--fall-spin)); }
+  }
+  @media (max-width: 68rem) {
+    .fall-field { display: none; }
+  }
+
   /* ─── motion and interaction ─────────────────────────────────────────── */
   .js .reveal {
     opacity: 0;
@@ -671,6 +709,8 @@
       opacity: 1;
       transform: none;
     }
+    .fall-field { display: none; }
+    .fall-item { animation: none !important; }
   }
 </style>
 </head>
@@ -700,6 +740,13 @@
     <symbol id="glyph-leaf" viewBox="0 0 24 24">
       <path d="M5 19 C 5 10, 11 5, 19 5 C 19 13, 14 19, 5 19 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
       <path d="M5 19 C 9 15, 13 11, 19 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="glyph-flower" viewBox="0 0 24 24">
+      <path d="M12 10 C 8 4, 4 6, 7 11 C 1 12, 3 17, 9 14 C 8 21, 14 21, 14 15 C 20 18, 22 12, 16 11 C 20 6, 15 3, 12 10 Z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="1.7" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="glyph-petal" viewBox="0 0 16 20">
+      <path d="M8 18 C 2 13, 3 5, 9 2 C 14 7, 13 14, 8 18 Z" fill="none" stroke="currentColor" stroke-width="1.25"/>
     </symbol>
     <symbol id="glyph-mail" viewBox="0 0 24 24">
       <rect x="3.5" y="6" width="17" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
@@ -732,6 +779,11 @@
     </symbol>
   </defs>
 </svg>
+
+<div class="fall-field" aria-hidden="true">
+  <div class="fall-field__gutter fall-field__gutter--left"></div>
+  <div class="fall-field__gutter fall-field__gutter--right"></div>
+</div>
 
 <!-- masthead (N6) -->
 <header class="masthead">
@@ -1032,6 +1084,47 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     reveals.forEach((element) => observer.observe(element));
+  })();
+
+  (() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion || window.innerWidth <= 1088) return;
+
+    const namespace = 'http://www.w3.org/2000/svg';
+    const gutters = document.querySelectorAll('.fall-field__gutter');
+    const shapes = [
+      { id: 'glyph-leaf', viewBox: '0 0 24 24', weight: 5 },
+      { id: 'glyph-flower', viewBox: '0 0 24 24', weight: 2 },
+      { id: 'glyph-petal', viewBox: '0 0 16 20', weight: 2 }
+    ];
+    const palette = ['var(--color-accent)', 'var(--color-accent-2)', 'var(--color-accent-3)'];
+    const weightedShapes = shapes.flatMap((shape) => Array(shape.weight).fill(shape));
+    const random = (min, max) => Math.random() * (max - min) + min;
+    const count = Math.floor(random(6, 11));
+
+    for (let index = 0; index < count; index += 1) {
+      const shape = weightedShapes[Math.floor(Math.random() * weightedShapes.length)];
+      const svg = document.createElementNS(namespace, 'svg');
+      const use = document.createElementNS(namespace, 'use');
+      const spin = random(180, 420) * (Math.random() > 0.5 ? 1 : -1);
+      const drift = random(18, 52) * (Math.random() > 0.5 ? 1 : -1);
+
+      svg.classList.add('fall-item');
+      svg.setAttribute('viewBox', shape.viewBox);
+      use.setAttribute('href', `#${shape.id}`);
+      svg.appendChild(use);
+      svg.style.setProperty('--fall-left', `${random(12, 76)}%`);
+      svg.style.setProperty('--fall-size', `${random(18, 34)}px`);
+      svg.style.setProperty('--fall-color', palette[index % palette.length]);
+      svg.style.setProperty('--fall-opacity', random(0.18, 0.38).toFixed(2));
+      svg.style.setProperty('--fall-duration', `${random(20, 34).toFixed(1)}s`);
+      svg.style.setProperty('--fall-delay', `${random(-32, 0).toFixed(1)}s`);
+      svg.style.setProperty('--fall-drift', `${drift.toFixed(1)}px`);
+      svg.style.setProperty('--fall-end', `${(-drift * 0.35).toFixed(1)}px`);
+      svg.style.setProperty('--fall-spin-half', `${(spin * 0.48).toFixed(1)}deg`);
+      svg.style.setProperty('--fall-spin', `${spin.toFixed(1)}deg`);
+      gutters[index % gutters.length].appendChild(svg);
+    }
   })();
 </script>
 
