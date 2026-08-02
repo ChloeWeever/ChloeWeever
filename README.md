@@ -86,7 +86,7 @@ Helped ship backend modules for the Xiong'an Enterprise Integrated Service Platf
 
 <table>
 <tr>
-<td width="24%" valign="top"><strong>OpenSlides</strong><br><sub>ACTIVE · V0.X</sub></td>
+<td width="24%" valign="top"><strong><a href="https://github.com/ChloeWeever/OpenSlides">OpenSlides</a></strong><br><sub>ACTIVE · V0.X</sub></td>
 <td valign="top">An Electron and React presentation editor that turns natural language into slides, with template and solo modes, sandboxed live preview, undo/redo, and single-file HTML export.</td>
 </tr>
 <tr>
