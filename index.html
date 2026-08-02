@@ -7,6 +7,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>document.documentElement.classList.add('js');</script>
 <title>Lu Yukai · Chloe Lu — Software, in the open</title>
 <meta name="description" content="A personal letter from Chloe Lu (Lu Yukai) — third-year Software Science student at ECNU, currently building AI agents at SAP Labs China." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -51,6 +52,12 @@
     --measure: 72ch;
     --rule:    1px solid var(--color-rule);
     --rule-soft: 1px solid color-mix(in oklch, var(--color-rule) 60%, transparent);
+
+    --dur-fast: 160ms;
+    --dur-base: 320ms;
+    --dur-reveal: 680ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -78,7 +85,7 @@
     text-decoration-color: color-mix(in oklch, var(--color-ink) 30%, transparent);
     text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
-    transition: text-decoration-color 160ms ease-out, color 160ms ease-out;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
   }
   a:hover {
     color: var(--color-accent);
@@ -423,6 +430,7 @@
     text-align: right;
     white-space: nowrap;
     padding-top: 0.45rem;
+    transition: color var(--dur-fast) var(--ease-out);
   }
   .project__status .dot {
     display: inline-block;
@@ -573,6 +581,62 @@
   .corner-doodle--tr { top: var(--space-md); right: var(--space-md); }
   .corner-doodle--bl { bottom: var(--space-md); left: var(--space-md); transform: rotate(180deg); }
 
+  /* ─── motion and interaction ─────────────────────────────────────────── */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition:
+      opacity var(--dur-reveal) var(--ease-out),
+      transform var(--dur-reveal) var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .hero.reveal { --reveal-delay: 80ms; }
+
+  .project,
+  .project__art,
+  .hero__avatar,
+  .skill:not(.is-group),
+  .contact li,
+  .ornament svg {
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      opacity var(--dur-base) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+  .project:hover,
+  .project:focus-within {
+    transform: translateY(-0.18rem);
+  }
+  .project:hover .project__art,
+  .project:focus-within .project__art {
+    transform: rotate(-2deg) scale(1.06);
+    border-color: var(--color-accent-2);
+  }
+  .project:hover .project__status,
+  .project:focus-within .project__status {
+    color: var(--color-accent-3);
+  }
+  .skill:not(.is-group):hover {
+    transform: translateY(-0.12rem) rotate(-1deg);
+    border-color: var(--color-accent-2);
+    background: var(--color-paper-2);
+  }
+  .hero__id:hover .hero__avatar {
+    transform: rotate(2deg) scale(1.05);
+  }
+  .contact li:hover,
+  .contact li:focus-within {
+    transform: translateX(0.2rem);
+  }
+  .ornament:hover svg {
+    transform: rotate(8deg) scale(1.06);
+  }
+
   /* ─── responsive ───────────────────────────────────────────────────── */
   @media (max-width: 640px) {
     .timeline li,
@@ -589,10 +653,24 @@
     .project__art svg { width: 1.4rem; height: 1.4rem; }
     .masthead__issue, .masthead__rule-meta { flex-wrap: wrap; }
     .corner-doodle { display: none; }
+    .project:hover,
+    .project:focus-within,
+    .contact li:hover,
+    .contact li:focus-within { transform: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+    .js .reveal,
+    .js .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
   }
 </style>
 </head>
@@ -674,7 +752,7 @@
 <main id="top">
 
   <!-- letter hero (H5) — copy left, hand-drawn monogram right -->
-  <section class="hero">
+  <section class="hero reveal">
     <div class="wrap">
       <div class="hero__grid">
         <div class="hero__copy">
@@ -750,7 +828,7 @@
   </div>
 
   <!-- now / experience -->
-  <section class="block">
+  <section class="block reveal">
     <div class="wrap">
       <h2 class="block__head">
         <svg class="stamp" aria-hidden="true"><use href="#glyph-quill"/></svg>
@@ -796,7 +874,7 @@
   </section>
 
   <!-- projects -->
-  <section class="block">
+  <section class="block reveal">
     <div class="wrap">
       <h2 class="block__head">
         <svg class="stamp" aria-hidden="true"><use href="#glyph-paper"/></svg>
@@ -855,7 +933,7 @@
   </section>
 
   <!-- toolbelt -->
-  <section class="block">
+  <section class="block reveal">
     <div class="wrap">
       <h2 class="block__head">
         <svg class="stamp" aria-hidden="true"><use href="#glyph-gear"/></svg>
@@ -879,7 +957,7 @@
   </section>
 
   <!-- contact -->
-  <section class="block">
+  <section class="block reveal">
     <div class="wrap">
       <h2 class="block__head">
         <svg class="stamp" aria-hidden="true"><use href="#glyph-mail"/></svg>
@@ -909,7 +987,7 @@
 </main>
 
 <!-- sign-off + colophon (Ft6) -->
-<footer class="signoff">
+<footer class="signoff reveal">
   <svg class="corner-doodle corner-doodle--bl" width="42" height="42" aria-hidden="true"><use href="#doodle-spiral"/></svg>
   <div class="wrap">
     <p class="signoff__body">
@@ -934,6 +1012,28 @@
     <span><a href="https://github.com/ChloeWeever">github</a> · <a href="mailto:luyukai47@outlook.com">email</a></span>
   </div>
 </div>
+
+<script>
+  (() => {
+    const reveals = document.querySelectorAll('.reveal');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      reveals.forEach((element) => element.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    reveals.forEach((element) => observer.observe(element));
+  })();
+</script>
 
 </body>
 </html>
